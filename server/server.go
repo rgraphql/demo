@@ -1,54 +1,47 @@
 package main
 
 import (
-	"context"
-	"net/http"
-	"os"
-
-	"github.com/rgraphql/magellan/schema"
+	"github.com/rgraphql/demo/app"
+	app_resolve "github.com/rgraphql/demo/app/resolve"
+	app_service "github.com/rgraphql/demo/app/service"
+	"github.com/rgraphql/rgraphql/resolver"
+	"github.com/rgraphql/rgraphql/schema"
+	server_rpc "github.com/rgraphql/rgraphql/server/rpc"
 	"github.com/sirupsen/logrus"
-	"github.com/urfave/cli"
 )
 
-var (
-	listen = ":8093"
-)
-
-func main() {
-	app := cli.NewApp()
-	app.Name = "server"
-	app.Usage = "magellan soyuz demo server"
-	app.HideVersion = true
-	app.Action = runServer
-	app.Flags = []cli.Flag{
-		cli.StringFlag{
-			Name:        "listen",
-			EnvVar:      "LISTEN",
-			Usage:       "listen string, default `LISTEN`",
-			Value:       listen,
-			Destination: &listen,
-		},
-	}
-
-	if err := app.Run(os.Args); err != nil {
-		logrus.Fatal(err.Error())
-	}
+// AppServer implements the app service.
+type AppServer struct {
+	le  *logrus.Entry
+	scm *schema.Schema
 }
 
-func runServer(_ *cli.Context) error {
-	// Construct the websocket server.
-	ctx := context.Background()
-	log := logrus.New()
-	log.SetLevel(logrus.DebugLevel)
-	le := logrus.NewEntry(log)
-
-	scm, err := schema.Parse(schemaStr)
+// NewAppServer constructs a AppServer with a RpcStream mux.
+func NewAppServer(le *logrus.Entry) (*AppServer, error) {
+	// Parse the rgraphql schema.
+	scm, err := app.ParseSchema()
 	if err != nil {
-		return err
+		return nil, err
 	}
-	server := NewServer(ctx, le, scm)
-	mux := http.NewServeMux()
-	mux.Handle("/ws", server)
-	le.Infof("starting listener on %s", listen)
-	return http.ListenAndServe(listen, mux)
+
+	return &AppServer{le: le, scm: scm}, nil
 }
+
+// RgraphqlQuery opens a two-way rgraphql query tree stream.
+func (s *AppServer) RgraphqlQuery(strm app_service.SRPCRgraphqlDemo_RgraphqlQueryStream) error {
+	// Start the session.
+	rootResolver := &app.RootResolver{}
+	sess := server_rpc.NewSession(
+		strm.Context(),
+		s.le,
+		s.scm,
+		strm,
+		func(r *resolver.Context) { app_resolve.ResolveRootQuery(r, rootResolver) },
+	)
+	defer strm.Close()
+
+	return sess.Execute()
+}
+
+// _ is a type assertion
+var _ app_service.SRPCRgraphqlDemoServer = ((*AppServer)(nil))

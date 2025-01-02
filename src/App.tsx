@@ -1,82 +1,104 @@
-import React from 'react'
+import { useEffect, useState } from 'react'
+import { useWebSocket } from './useWebSocket'
+import { WebSocketConn } from 'starpc'
+import { RgraphqlDemoClient } from '../app/service/service_srpc.pb.js'
+import { RGQLClientMessage, Client as RGraphQLClient } from 'rgraphql'
+import { pushable } from 'it-pushable'
+import { pipe } from 'it-pipe'
+
 import './App.css'
+import { buildAppSchema } from './schema.js'
 
-import { JSONDecoder, RunningQuery, SoyuzClient } from 'soyuz'
-import { schema } from './schema'
-import { DialWebsocketClient } from './websocketClient'
-import { CodeViewer } from './CodeViewer'
+const serverAddr = 'ws://localhost:8093/demo.ws'
+const schema = buildAppSchema()
 
-const AppDemoQuery = `{
-  counter
-  names
-  allPeople {
-    name
-    height
-  }
-}`
+function App() {
+  const [count, setCount] = useState(0)
+  const { ws, getStatusMessage } = useWebSocket(serverAddr)
+  const [rgqlClient, setRgqlClient] = useState<RGraphQLClient | undefined>(
+    undefined,
+  )
 
-interface AppProps {}
+  useEffect(() => {
+    if (!ws) return
 
-interface AppState {
-  counter?: number
-  names?: string[]
-  allPeople?: any[]
-}
+    // abort signal
+    const abortController = new AbortController()
+    const abortSignal = abortController.signal
 
-class App extends React.Component<AppProps, AppState> {
-  private soyuzClient?: SoyuzClient
-  private query?: RunningQuery
+    console.log('Initializing srpc client with WebSocket...', ws)
+    const conn = new WebSocketConn(ws, 'outbound')
+    const client = conn.buildClient()
+    const serviceClient = new RgraphqlDemoClient(client)
 
-  constructor(params: {}) {
-    super(params)
-    this.state = {}
-  }
+    // build the message source for outgoing msgs
+    const txMessages = pushable<RGQLClientMessage>({
+      objectMode: true,
+    })
 
-  public componentDidMount() {
-    this.startClient()
-  }
+    // start the rpc
+    console.log('Initializing rgraphql with srpc...')
+    const rxMessages = serviceClient.RgraphqlQuery(txMessages, abortSignal)
 
-  public render() {
+    // initialize the rgraphql client
+    const rgqlClient = new RGraphQLClient(schema, (msg) => txMessages.push(msg))
+
+    // read incoming messages
+    const rxFunc = async () => {
+      for await (const msg of rxMessages) {
+        if (Array.isArray(msg)) {
+          rgqlClient.handleMessages(msg)
+        } else {
+          rgqlClient.handleMessages([msg])
+        }
+      }
+    }
+    queueMicrotask(() => {
+      rxFunc()
+        .catch((err) => console.warn('error in rpc stream', err))
+        .finally(() => rgqlClient.dispose())
+    })
+
+    // client ready
+    setRgqlClient(rgqlClient)
+
+    return () => {
+      abortController.abort()
+    }
+  }, [ws])
+
+  if (!ws) {
     return (
-      <div className="App">
-        <CodeViewer
-            language="json"
-            data={JSON.stringify(this.state, undefined, '\t')}
-        />
+      <div>
+        <h1>{getStatusMessage()}</h1>
+        <h4>Server: {serverAddr}</h4>
       </div>
     )
   }
 
-  private async startClient() {
-    // TODO: connect websocket
-    // TODO: re-construct soyuz client is websocket reconnects
-    try {
-      this.soyuzClient = await DialWebsocketClient(
-        'ws://localhost:8093/ws',
-        schema
-      )
-    } catch (e) {
-      /* tslint:disable-next-line */
-      console.error('dial websocket client', e)
-      return
-    }
-    if (!this.soyuzClient) {
-      return
-    }
-    this.query = this.soyuzClient.parseQuery(AppDemoQuery)
-    this.query.attachHandler(
-      new JSONDecoder(
-        this.soyuzClient.getQueryTree().getRoot(),
-        this.query.getQuery(),
-        (val: any) => {
-            console.log('value updated', val)
-          if (val) {
-            this.setState(val)
-          }
-        }
-      )
+  if (!rgqlClient) {
+    return (
+      <div>
+        <h1>rGraphQL initializing...</h1>
+        <h4>Server: {serverAddr}</h4>
+      </div>
     )
   }
+
+  return (
+    <>
+      <h1>Vite + React + starpc</h1>
+      <h3>Connected to {serverAddr}</h3>
+      <div className="card">
+        <button onClick={() => setCount((count) => count + 1)}>
+          count is {count}
+        </button>
+        <p>
+          Edit <code>src/App.tsx</code> and save to test HMR
+        </p>
+      </div>
+    </>
+  )
 }
 
 export default App

@@ -1,79 +1,70 @@
 {
-  "name": "magellan-soyuz-demo",
-  "version": "0.1.0",
+  "name": "@rgraphql/demo",
+  "description": "rgraphql demo frontend",
+  "version": "0.0.0",
   "private": true,
+  "license": "MIT",
+  "author": {
+    "name": "Aperture Robotics LLC.",
+    "email": "support@aperture.us",
+    "url": "http://aperture.us"
+  },
+  "contributors": [
+    {
+      "name": "Christian Stewart",
+      "email": "christian@aperture.us",
+      "url": "http://github.com/paralin"
+    }
+  ],
+  "repository": {
+    "url": "git+ssh://git@github.com/rgraphql/demo.git"
+  },
+  "type": "module",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "gen:proto": "make genproto",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "gen": "make genproto",
-    "typecheck": "tsc --project tsconfig.json --noEmit",
-    "deps": "depcheck --ignores bufferutil,utf-8-validate,ts-proto,ts-poet,esbuild,protobufjs,graphql,@aperturerobotics/ts-common,@types/jest,typedoc",
+    "dev": "vite",
+    "serve": "npm run dev",
+    "preview": "vite preview",
+    "build": "tsc -b && vite build",
+    "check": "npm run typecheck",
+    "typecheck": "tsc --noEmit",
+    "deps": "depcheck --ignore-patterns=.eslintrc.cjs,package.json --ignores depcheck,rimraf,prettier,typescript,starpc,@go/github.com,@aptre/common",
+    "codegen": "npm run gen",
+    "ci": "npm run build && npm run lint:js && npm run lint:go",
+    "format": "npm run format:go && npm run format:js && npm run format:config",
+    "format:config": "prettier --write package.json",
+    "format:go": "make format",
+    "format:js": "npm run format:js:changed",
+    "format:js:changed": "git diff --name-only --diff-filter=d HEAD | grep '\\(\\.ts\\|\\.tsx\\|\\.html\\|\\.css\\|\\.scss\\)$' | xargs -I {} prettier --write {}",
+    "format:js:all": "prettier --write './!(vendor|dist)/**/(*.ts|*.tsx|*.js|*.html|*.css)'",
+    "gen": "make genproto && go generate -v ./app",
+    "test": "make test && npm run check && npm run test:js",
+    "test:js": "echo No JS tests.",
     "lint": "npm run lint:go && npm run lint:js",
     "lint:go": "make lint",
-    "lint:js": "eslint -c .eslintrc.js --ext .ts ./**/*.ts",
-    "precommit": "npm run format",
-    "format": "prettier --write './!(vendor|dist)/**/(*.ts|*.tsx|*.html|*.css)'",
-    "patch": "patch-package --use-yarn --patch-dir ./node_modules/@aperturerobotics/ts-common/patches",
-    "prepare": "npm run patch && go mod vendor"
-  },
-  "dependencies": {
-    "@testing-library/jest-dom": "^6.1.5",
-    "@testing-library/react": "^14.1.2",
-    "@types/jest": "^29.5.11",
-    "@types/react": "^18.2.45",
-    "@types/react-dom": "^18.2.18",
-    "@typescript-eslint/eslint-plugin": "^6.15.0",
-    "eslint-config-prettier": "^9.1.0",
-    "graphql": "^16.8.1",
-    "husky": "^8.0.3",
-    "long": "^5.2.3",
-    "monaco-editor": "^0.45.0",
-    "protobufjs": "^7.2.5",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-monaco-editor": "^0.55.0",
-    "react-scripts": "5.0.1",
-    "rgraphql": "^0.9.0",
-    "soyuz": "^0.7.6",
-    "typescript": "~5.3.3"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "lint-staged": {
-    "{src,test}/**/*.{ts,tsx}": [
-      "prettier --write",
-      "git add"
-    ]
-  },
-  "prettier": {
-    "semi": false,
-    "singleQuote": true
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run precommit"
-    }
+    "lint:js": "ESLINT_USE_FLAT_CONFIG=false eslint -c .eslintrc.cjs ./src",
+    "prepare": "go mod vendor && rimraf ./.tools",
+    "precommit": "npm run format"
   },
   "devDependencies": {
-    "@aperturerobotics/ts-common": "^0.8.1",
-    "@typescript-eslint/parser": "^6.15.0",
+    "@aptre/common": "^0.20.0",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^4.3.4",
     "depcheck": "^1.4.7",
-    "lint-staged": "^15.2.0",
-    "prettier": "^3.1.1",
-    "ts-poet": "^6.6.0",
-    "ts-proto": "^1.165.2"
+    "globals": "^15.14.0",
+    "prettier": "^3.3.3",
+    "rimraf": "^6.0.0",
+    "typescript": "^5.6.2",
+    "vite": "^6.0.7"
+  },
+  "dependencies": {
+    "@aptre/protobuf-es-lite": "^0.4.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "rgraphql": "^1.4.0",
+    "starpc": "^0.36.0"
+  },
+  "resolutions": {
+    "@aptre/protobuf-es-lite": "^0.4.1"
   }
 }

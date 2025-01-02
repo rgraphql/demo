@@ -1,22 +1,6 @@
-import { buildSchema } from 'graphql'
+import { buildSchema as buildGraphqlSchema } from 'graphql'
+import schemaText from '../app/app.graphql?raw'
 
-// schema is the system schema
-export const schema = buildSchema(`
-# RootQuery is the root query object.
-type RootQuery {
-counter: Int
-names: [String]
-allPeople: [Person]
-singlePerson: Person
+export function buildAppSchema() {
+  return buildGraphqlSchema(schemaText)
 }
-
-# Person represents an individual.
-type Person {
-name: String
-height: Int
-}
-
-schema {
-query: RootQuery
-}
-`)

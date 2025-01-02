@@ -1,0 +1,10 @@
+syntax = "proto3";
+package app.service;
+
+import "github.com/rgraphql/rgraphql/rgraphql.proto";
+
+// RgraphqlDemo is the demo service.
+service RgraphqlDemo {
+  // RgraphqlQuery opens a two-way rgraphql query tree stream.
+  rpc RgraphqlQuery(stream .rgraphql.RGQLClientMessage) returns (stream .rgraphql.RGQLServerMessage);
+}
