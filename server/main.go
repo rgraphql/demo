@@ -9,7 +9,7 @@ import (
 	"github.com/coder/websocket"
 	app_service "github.com/rgraphql/demo/app/service"
 	"github.com/sirupsen/logrus"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 var listen = "localhost:8093"
@@ -21,9 +21,9 @@ func main() {
 	app.HideVersion = true
 	app.Action = runServer
 	app.Flags = []cli.Flag{
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:        "listen",
-			EnvVar:      "LISTEN",
+			EnvVars:     []string{"LISTEN"},
 			Usage:       "listen string, default `LISTEN`",
 			Value:       listen,
 			Destination: &listen,

@@ -14,7 +14,7 @@ require (
 require (
 	github.com/coder/websocket v1.8.12
 	github.com/sirupsen/logrus v1.9.3
-	github.com/urfave/cli v1.22.16
+	github.com/urfave/cli/v2 v2.27.5
 )
 
 require (
@@ -43,7 +43,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
-	github.com/urfave/cli/v2 v2.27.5 // indirect
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67 // indirect
