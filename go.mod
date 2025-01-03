@@ -8,7 +8,7 @@ require (
 	github.com/aperturerobotics/common v0.20.3 // latest
 	github.com/aperturerobotics/protobuf-go-lite v0.8.0 // indirect; latest
 	github.com/aperturerobotics/starpc v0.36.2-0.20250103065853-1198ab25ec5a // main
-	github.com/rgraphql/rgraphql v1.4.1-0.20250103064416-220415d4a1c6 // remove-reflect
+	github.com/rgraphql/rgraphql v1.4.1 // remove-reflect
 )
 
 require (
