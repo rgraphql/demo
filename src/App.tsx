@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
-import { useWebSocket } from './useWebSocket'
 import { WebSocketConn } from 'starpc'
+import { useWebSocket } from './useWebSocket.js'
 import { RgraphqlDemoClient } from '../app/service/service_srpc.pb.js'
 import { RGQLClientMessage, Client as RGraphQLClient } from 'rgraphql'
 import { pushable } from 'it-pushable'
-import { pipe } from 'it-pipe'
 
 import './App.css'
 import { buildAppSchema } from './schema.js'

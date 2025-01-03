@@ -62,19 +62,22 @@ export const useWebSocket = (url: string) => {
           error: 'Connection error occurred',
         })
       }
+
+      return socket
     } catch (error) {
       console.error('Failed to create WebSocket:', error)
+      return undefined
     }
   }, [url])
 
   useEffect(() => {
-    connect()
+    const socket = connect()
 
     return () => {
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current)
       }
-      ws?.close()
+      socket?.close()
     }
   }, [connect])
 
