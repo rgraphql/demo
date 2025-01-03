@@ -12,6 +12,7 @@ require (
 )
 
 require (
+	github.com/coder/websocket v1.8.12
 	github.com/sirupsen/logrus v1.9.3
 	github.com/urfave/cli v1.22.16
 )
@@ -19,7 +20,6 @@ require (
 require (
 	github.com/aperturerobotics/json-iterator-lite v1.0.1-0.20240713111131-be6bf89c3008 // indirect
 	github.com/aperturerobotics/util v1.27.1 // indirect
-	github.com/coder/websocket v1.8.12 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.5 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.3.0 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
