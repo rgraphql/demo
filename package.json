@@ -63,7 +63,7 @@
     "it-pushable": "^3.2.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "rgraphql": "^1.4.0",
+    "rgraphql": "^1.4.1",
     "starpc": "^0.36.0"
   },
   "resolutions": {

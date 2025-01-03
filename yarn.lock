@@ -2784,10 +2784,10 @@ reusify@^1.0.4:
   resolved "https://registry.yarnpkg.com/reusify/-/reusify-1.0.4.tgz#90da382b1e126efc02146e90845a88db12925d76"
   integrity sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==
 
-rgraphql@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/rgraphql/-/rgraphql-1.4.0.tgz#0a78f5badc8e76e4467957303c2fe80db776d879"
-  integrity sha512-fHSbHRW0UNi+bzFLiYfzvoaLMKZlGrNyaNZ2+yi7kVHXDdl6wuYJp0cgoeYMWQhQ4C6uJIAlEdzCxHbNATympA==
+rgraphql@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/rgraphql/-/rgraphql-1.4.1.tgz#14a509c61bb12c3688eb33e95861af7f8856fdf3"
+  integrity sha512-KLZNRdNizmB1bUx3cYbALyYCHrRAqiTiwDZUWiISnexkbIm0OVNxxYxphyxM5JlLeMaIY3m1uuRs9f8e+Vx4oQ==
   dependencies:
     "@aptre/protobuf-es-lite" "^0.4.4"
     graphql "^16.8.1"
