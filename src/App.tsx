@@ -2,7 +2,11 @@ import { useEffect, useState } from 'react'
 import { WebSocketConn } from 'starpc'
 import { useWebSocket } from './useWebSocket.js'
 import { RgraphqlDemoClient } from '../app/service/service_srpc.pb.js'
-import { RGQLClientMessage, Client as RGraphQLClient } from 'rgraphql'
+import {
+  JSONDecoder,
+  RGQLClientMessage,
+  Client as RGraphQLClient,
+} from 'rgraphql'
 import { pushable } from 'it-pushable'
 
 import './App.css'
@@ -10,6 +14,15 @@ import { buildAppSchema } from './schema.js'
 
 const serverAddr = 'ws://localhost:8093/demo.ws'
 const schema = buildAppSchema()
+
+const AppDemoQuery = `{
+  counter
+  names
+  allPeople {
+    name
+    height
+  }
+}`
 
 function App() {
   const [count, setCount] = useState(0)
@@ -66,6 +79,30 @@ function App() {
     }
   }, [ws])
 
+  // rpc
+  const [displayResult, setDisplayResult] = useState<string | undefined>(
+    undefined,
+  )
+  useEffect(() => {
+    if (!rgqlClient) return
+    const query = rgqlClient.parseQuery(AppDemoQuery)
+    const handler = new JSONDecoder(
+      rgqlClient.getQueryTree().getRoot(),
+      query.getQuery(),
+      (val: unknown) => {
+        if (val) {
+          console.log({ val })
+          setDisplayResult(JSON.stringify(val, null, '\t'))
+        }
+      },
+    )
+    query.attachHandler(handler)
+    return () => {
+      query.detachHandler(handler)
+      query.dispose()
+    }
+  }, [rgqlClient])
+
   if (!ws) {
     return (
       <div>
@@ -88,6 +125,9 @@ function App() {
     <>
       <h1>Vite + React + starpc</h1>
       <h3>Connected to {serverAddr}</h3>
+      <div className="result">
+        <pre>result: {displayResult}</pre>
+      </div>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
